@@ -1,4 +1,7 @@
-﻿namespace Messenger.Server
+﻿using System.Net;
+using System.Text;
+
+namespace Messenger.Server
 {
     internal class Program 
     { 
