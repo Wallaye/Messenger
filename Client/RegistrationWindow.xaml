@@ -1,0 +1,24 @@
+﻿<Window x:Class="Client.RegistrationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Client"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        WindowStyle="None"
+        Title="RegistrationWindow" Height="360" Width="500">
+    <Grid>
+        <Grid.Background>
+            <RadialGradientBrush>
+                <GradientStop Color="#FFDEACAC" Offset="1"/>
+                <GradientStop Color="White"/>
+            </RadialGradientBrush>
+        </Grid.Background>
+        <Label x:Name="lblExit" Content="Х" HorizontalAlignment="Left" Height="37" Margin="456,10,0,0" VerticalAlignment="Top" Width="25" FontSize="22" Foreground="Red" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" MouseLeftButtonDown="lblExit_MouseLeftButtonDown" Cursor="Hand"/>
+        <Button x:Name="btnRegister" Content="Зарегистрироваться" HorizontalAlignment="Left" Height="44" Margin="36,283,0,0" VerticalAlignment="Top" Width="188" FontSize="18" Background="#FFEBF1C5"/>
+        <Button x:Name="btnLogin" Content="Уже есть аккаунт" HorizontalAlignment="Left" Height="44" Margin="280,283,0,0" VerticalAlignment="Top" Width="188" FontSize="18" Background="#FFAAED86" Click="btnLogin_Click"/>
+        <Button Content="Button" HorizontalAlignment="Left" Margin="944,305,0,0" VerticalAlignment="Top" Width="0"/>
+    </Grid>
+</Window>
