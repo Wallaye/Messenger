@@ -60,27 +60,9 @@ namespace Client
             }
             string pass = hashPass(txtPass.Password);
             string str = txtLogin.Text + " " + pass;
-            //Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            //try
-            //{
-            //    IPEndPoint ip = new IPEndPoint(IPAddress.Parse("192.168.0.115"), 5500);
-            //    sock.Connect(ip);
-            //    sock.Send(Encoding.UTF8.GetBytes(str));
-
-            //    int bytesread = 0;
-            //    byte[] data = new byte[256];
-            //    do
-            //    {
-            //        bytesread = sock.Receive(data);
-            //    } while (bytesread > 0);
-            //    MessageBox.Show(Encoding.UTF8.GetString(data));
-            //    sock.Shutdown(SocketShutdown.Both);
-            //    sock.Close();
-            //}
             string reply = "";
             try
             {
-                
                 TcpClient tcp = new();
                 tcp.Connect("192.168.0.115", 5500);
                 if (tcp.Connected)
@@ -107,7 +89,6 @@ namespace Client
                 MessageBox.Show(ex.Message);
                 return;
             }
-
             switch (reply)
             {
                 case "Неверный пароль":
@@ -157,3 +138,21 @@ namespace Client
         }
     }
 }
+
+//Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+//try
+//{
+//    IPEndPoint ip = new IPEndPoint(IPAddress.Parse("192.168.0.115"), 5500);
+//    sock.Connect(ip);
+//    sock.Send(Encoding.UTF8.GetBytes(str));
+
+//    int bytesread = 0;
+//    byte[] data = new byte[256];
+//    do
+//    {
+//        bytesread = sock.Receive(data);
+//    } while (bytesread > 0);
+//    MessageBox.Show(Encoding.UTF8.GetString(data));
+//    sock.Shutdown(SocketShutdown.Both);
+//    sock.Close();
+//}

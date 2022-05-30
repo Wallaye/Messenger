@@ -7,7 +7,10 @@ namespace Messenger.Server
     { 
         public static void Main()
         {
-            Server.start();
+            Thread trd = new Thread(Server.start);
+            trd.Start();
+            if (Console.ReadLine() == "exit")
+                Server.stop();
         }    
     }
 }

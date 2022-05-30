@@ -17,8 +17,15 @@
             </RadialGradientBrush>
         </Grid.Background>
         <Label x:Name="lblExit" Content="Х" HorizontalAlignment="Left" Height="37" Margin="456,10,0,0" VerticalAlignment="Top" Width="25" FontSize="22" Foreground="Red" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" MouseLeftButtonDown="lblExit_MouseLeftButtonDown" Cursor="Hand"/>
-        <Button x:Name="btnRegister" Content="Зарегистрироваться" HorizontalAlignment="Left" Height="44" Margin="36,283,0,0" VerticalAlignment="Top" Width="188" FontSize="18" Background="#FFEBF1C5"/>
+        <Button x:Name="btnRegister" Content="Зарегистрироваться" HorizontalAlignment="Left" Height="44" Margin="36,283,0,0" VerticalAlignment="Top" Width="188" FontSize="18" Background="#FFEBF1C5" Click="btnRegister_Click"/>
         <Button x:Name="btnLogin" Content="Уже есть аккаунт" HorizontalAlignment="Left" Height="44" Margin="280,283,0,0" VerticalAlignment="Top" Width="188" FontSize="18" Background="#FFAAED86" Click="btnLogin_Click"/>
         <Button Content="Button" HorizontalAlignment="Left" Margin="944,305,0,0" VerticalAlignment="Top" Width="0"/>
+        <Label Content="Регистрация" HorizontalAlignment="Center" Height="46" Margin="0,28,0,0" VerticalAlignment="Top" Width="166" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <Label Content="Логин:" HorizontalAlignment="Left" Height="34" Margin="53,80,0,0" VerticalAlignment="Top" Width="84" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" FontSize="18"/>
+        <Label Content="Пароль:" HorizontalAlignment="Left" Height="34" Margin="53,136,0,0" VerticalAlignment="Top" Width="84" HorizontalContentAlignment="Right" VerticalContentAlignment="Bottom" FontSize="18"/>
+        <Label Content="Повторите пароль:" HorizontalAlignment="Left" Height="34" Margin="-5,195,0,0" VerticalAlignment="Top" Width="142" HorizontalContentAlignment="Right" FontSize="14"/>
+        <TextBox x:Name="txtLogin" HorizontalAlignment="Center" Height="34" Margin="0,80,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="206" FontSize="18" TextAlignment="Left" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" PreviewTextInput="txtLogin_PreviewTextInput"/>
+        <PasswordBox x:Name="pswPass1" HorizontalAlignment="Center" Height="34" Margin="0,136,0,0" VerticalAlignment="Top" Width="206" PreviewTextInput="pswPass1_PreviewTextInput"/>
+        <PasswordBox x:Name="pswPass2" HorizontalAlignment="Center" Height="34" Margin="0,195,0,0" VerticalAlignment="Top" Width="206" PreviewTextInput="pswPass2_PreviewTextInput"/>
     </Grid>
 </Window>

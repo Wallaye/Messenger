@@ -5,12 +5,12 @@ namespace Data
     public class User
     {
         [DataMember]
-        private int UserID { get; }
+        private int UserID { get; set; }
         [DataMember]
-        public string Name { get; }
+        public string Name { get; set; }
         [DataMember]
         private string _pass;
-        public string Pass { get { return _pass; } }
+        public string Pass { get { return _pass; } set { _pass = value; } }
         public User(int id, string name, string pass)
         {
             UserID = id;

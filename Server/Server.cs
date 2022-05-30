@@ -14,9 +14,9 @@ namespace Messenger.Server
         private static readonly IPAddress _defaultIPAdress = IPAddress.Parse("192.168.0.115");
         private static readonly List<ConnectedUser> _connectedUsers = new List<ConnectedUser>();
         private static readonly int _port = 5500;
-        private static List<User> _users;
-        private static List<Message> _messages;
-        private static List<GroupChat> _chats;
+        private static List<User> _users = new List<User>();
+        private static List<Message> _messages = new List<Message>();
+        private static List<GroupChat> _chats = new List<GroupChat>();
         private static DataContractJsonSerializer _usersSer = new(typeof(List<User>));
         private static DataContractJsonSerializer _msgSer = new(typeof(List<Message>));
         private static DataContractJsonSerializer _grpSer = new(typeof(List<GroupChat>));
@@ -47,7 +47,10 @@ namespace Messenger.Server
         /// </summary>
         public static void stop()
         {
-            
+            using (var file = new FileStream(@"..\..\..\JSON\Users.json", FileMode.Create))
+            {
+                _usersSer.WriteObject(file, _users);
+            }
         }
 
        
@@ -162,12 +165,12 @@ namespace Messenger.Server
                         int k = ValidateUser.Authorize(words[0], words[1], _users);
                         switch (k)
                         {
-                            case 1:
+                            case -1:
                                 sw.WriteLine("Неверный пароль");
                                 client.Client.Disconnect(false);
                                 //client.Send(Encoding.UTF8.GetBytes("Неверный пароль"));
                                 return;
-                            case 2:
+                            case -2:
                                 sw.WriteLine("Такого пользователя не существует");
                                 client.Client.Disconnect(false);
                                 return;
@@ -186,7 +189,6 @@ namespace Messenger.Server
                         {
                             case 0:
                                 sw.WriteLine("Новый пользователь зарегистрирован");
-                                _users.Add(new User(_users.Count, words[1], words[2]));
                                 _connectedUsers.Add(new ConnectedUser(_users[^1], client));
                                 break;
                             case 1:
