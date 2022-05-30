@@ -1,15 +1,16 @@
-﻿namespace Data
+﻿using System.Runtime.Serialization;
+namespace Data
 {
+    [DataContract]
     public class User
     {
-        public int UserID { get; set; }
-        public string Name { get; set; }
+        [DataMember]
+        private int UserID { get; }
+        [DataMember]
+        public string Name { get; }
+        [DataMember]
         private string _pass;
-        public string Pass
-        {
-            get { return _pass; }
-            set { _pass = value; } 
-        }
+        public string Pass { get { return _pass; } }
         public User(int id, string name, string pass)
         {
             UserID = id;

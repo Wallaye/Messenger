@@ -20,6 +20,9 @@
         <Label x:Name="lblExit" Content="Х" HorizontalAlignment="Left" Height="37" Margin="456,10,0,0" VerticalAlignment="Top" Width="25" FontSize="22" Foreground="Red" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" MouseLeftButtonDown="lblExit_MouseLeftButtonDown" Cursor="Hand"/>
         <Button x:Name="btnLogin" Content="Войти" HorizontalAlignment="Center" Height="34" Margin="0,259,0,0" VerticalAlignment="Top" Width="187" Background="#FF99F396" FontSize="18" IsDefault="True" Click="btnLogin_Click"/>
         <Button x:Name="btnRegister" Content="Зарегистрироваться" HorizontalAlignment="Center" Height="34" Margin="0,306,0,0" VerticalAlignment="Top" Width="188" Background="#FF78D3DA" FontSize="18" Click="btnRegister_Click"/>
-
+        <Label Content="Логин:" HorizontalAlignment="Left" Height="32" Margin="61,107,0,0" VerticalAlignment="Top" Width="70" FontSize="18" HorizontalContentAlignment="Right"/>
+        <TextBox x:Name="txtLogin" HorizontalAlignment="Center" Height="32" Margin="0,107,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="228" Background="White" FontSize="18" PreviewTextInput="txtLogin_PreviewTextInput"/>
+        <Label x:Name="lblPassword" Content="Пароль:" HorizontalAlignment="Left" Height="33" Margin="50,168,0,0" VerticalAlignment="Top" Width="81" FontSize="18" HorizontalContentAlignment="Right"/>
+        <PasswordBox x:Name="txtPass" HorizontalAlignment="Center" Height="32" Margin="0,169,0,0" VerticalAlignment="Top" Width="228" FontSize="18" PreviewTextInput="txtPass_PreviewTextInput"/>
     </Grid>
 </Window>

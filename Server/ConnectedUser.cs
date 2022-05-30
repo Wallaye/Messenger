@@ -1,17 +1,17 @@
 ﻿using System.Net.Sockets;
+using Data;
+
 namespace Messenger.Server
 {
     public class ConnectedUser
     {
-        public int ID { get; }
-        public string Name { get; }
+        public User user;
         public TcpClient tcpClient;
         public StreamReader sr;
         public StreamWriter sw;
-        public ConnectedUser(int id, string name, TcpClient tcp)
+        public ConnectedUser(User user, TcpClient tcp)
         {
-            ID = id;
-            Name = name;
+            this.user = user;
             tcpClient = tcp;
             sr = new(tcpClient.GetStream());
             sw = new(tcpClient.GetStream());
