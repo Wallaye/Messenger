@@ -61,9 +61,9 @@ namespace Client
             string pass = hashPass(txtPass.Password);
             string str = txtLogin.Text + " " + pass;
             string reply = "";
+            TcpClient tcp = new();
             try
             {
-                TcpClient tcp = new();
                 tcp.Connect("192.168.0.115", 5500);
                 if (tcp.Connected)
                 {
@@ -99,8 +99,8 @@ namespace Client
                     return;
                 case "Вы авторизованы":
                     MessageBox.Show("Вы авторизованы");
-                    //new MainWindow().Show();
-                    //this.Close();
+                    new MainWindow(tcp).Show();
+                    this.Close();
                     break;
             }
         }
@@ -110,7 +110,6 @@ namespace Client
             new RegistrationWindow().Show();
             this.Close();
         }
-
         private void txtLogin_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             if (!Char.IsLetterOrDigit(e.Text, 0))
@@ -138,21 +137,3 @@ namespace Client
         }
     }
 }
-
-//Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-//try
-//{
-//    IPEndPoint ip = new IPEndPoint(IPAddress.Parse("192.168.0.115"), 5500);
-//    sock.Connect(ip);
-//    sock.Send(Encoding.UTF8.GetBytes(str));
-
-//    int bytesread = 0;
-//    byte[] data = new byte[256];
-//    do
-//    {
-//        bytesread = sock.Receive(data);
-//    } while (bytesread > 0);
-//    MessageBox.Show(Encoding.UTF8.GetString(data));
-//    sock.Shutdown(SocketShutdown.Both);
-//    sock.Close();
-//}

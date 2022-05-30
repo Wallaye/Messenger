@@ -1,8 +1,6 @@
-﻿using System.Net.Sockets;
+﻿using Data;
 using System.Net;
-using System.Text;
-using System.Threading;
-using Data;
+using System.Net.Sockets;
 using System.Runtime.Serialization.Json;
 using System.Text.Json;
 
@@ -27,18 +25,8 @@ namespace Messenger.Server
         /// </summary>
         public static void start()
         {
-            //using (var file = new FileStream(@"..\..\..\JSON\Users.json", FileMode.Open))
-            //{
-            //    _users = _usersSer.ReadObject(file) as List<User>;
-            //}
-            //using (var file = new FileStream(@"..\..\..\JSON\Messages.json", FileMode.Open))
-            //{
-            //    _messages = _msgSer.ReadObject(file) as List<Message>;
-            //}
-            //using (var file = new FileStream(@"..\..\..\JSON\GroupChats.json", FileMode.Open))
-            //{
-            //    _chats = _grpSer.ReadObject(file) as List<GroupChat>;
-            //}
+            //DeserializeUsers();
+            //DeserializeMessages();
             _trdAccept.Start();
         }
 
@@ -47,13 +35,56 @@ namespace Messenger.Server
         /// </summary>
         public static void stop()
         {
+            SerializeUsers();
+            SerializeMessages();
+            Environment.Exit(0);
+        }
+
+        #region Сериализация
+        public static void SerializeUsers()
+        {
             using (var file = new FileStream(@"..\..\..\JSON\Users.json", FileMode.Create))
             {
                 _usersSer.WriteObject(file, _users);
             }
         }
+        public static void DeserializeUsers()
+        {
+            using (var file = new FileStream(@"..\..\..\JSON\Users.json", FileMode.Open))
+            {
+                _users = _usersSer.ReadObject(file) as List<User>;
+            }
+        }
+        public static void SerializeMessages()
+        {
+            using (var file = new FileStream(@"..\..\..\JSON\Messages.json", FileMode.Create))
+            {
+                _msgSer.WriteObject(file, _messages);
+            }
+        }
+        public static void DeserializeMessages()
+        {
+            using (var file = new FileStream(@"..\..\..\JSON\Messages.json", FileMode.Create))
+            {
+                _messages = _msgSer.ReadObject(file) as List<Message>;
+            }
+        }
+        public static void SerializeGroups()
+        {
+            using (var file = new FileStream(@"..\..\..\JSON\GroupChats.json", FileMode.Create))
+            {
+                _grpSer.WriteObject(file, _chats);
+            }
+        }
+        public static void DeserializeGroups()
+        {
+            using (var file = new FileStream(@"..\..\..\JSON\GroupChats.json", FileMode.Create))
+            {
+                _chats = _grpSer.ReadObject(file) as List<GroupChat>;
+            }
+        }
+        #endregion Сериализация
 
-       
         public static void recieveMessage()
         {
             throw new NotImplementedException();
@@ -67,9 +98,10 @@ namespace Messenger.Server
                 {
                     string str = client.sr.ReadToEnd();
                     Message msg = JsonSerializer.Deserialize(str, typeof(Message)) as Message;
-                    sendMessage(msg);
+                    if (msg != null)
+                        _messages.Add(msg);
                 }
-                catch (Exception exc) 
+                catch (Exception exc)
                 {
                     Console.WriteLine(exc.Message);
                 }
@@ -78,13 +110,15 @@ namespace Messenger.Server
 
         public static void sendMessage(Message msg)
         {
-            throw new NotImplementedException();
+            
         }
 
         public static void sendMessages()
         {
             throw new NotImplementedException();
         }
+
+        #region Подключения
         /// <summary>
         /// Метод для подключения к серверу в первый раз.
         /// Вызывает метод acceptConnection который обрабатывает клиента
@@ -97,59 +131,10 @@ namespace Messenger.Server
                 var client = _tcpListener.AcceptTcpClient();
                 acceptConnection(client);
             }
-            //Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            //socket.Bind(new IPEndPoint(_defaultIPAdress, _port));
-            //socket.Listen(5);
-            //while (true)
-            //{
-            //    Socket client = socket.Accept();
-            //    Console.WriteLine(client.RemoteEndPoint);
-            //    acceptConnection(socket, client);
-            //    client.Shutdown(SocketShutdown.Both);
-            //    client.Close();
-            //}
         }
         /// <summary>
-        /// Метод выдачи подключенному клиенту отдельного потока и сокета.
+        /// Асинхронный метод принятия пользователяя
         /// </summary>
-        //public static void acceptConnection(Socket server, Socket client)
-        //{
-        //    byte[] data = new byte[256];
-        //    int bytesread = 0;
-        //    StringBuilder sb = new();
-        //    bytesread = client.Receive(data);
-        //    sb.Append(Encoding.UTF8.GetString(data, 0, bytesread));
-        //    Console.WriteLine(sb);
-        //    var str = sb.ToString().Split(" ");
-        //    if (str.Length == 2)
-        //    {
-        //        switch (ValidateUser.Authorize(str[0], str[1], _users))
-        //        {
-        //            case 0:
-        //                client.Send(Encoding.UTF8.GetBytes("Вы авторизованы"));
-        //                break;
-        //            case 1:
-        //                client.Send(Encoding.UTF8.GetBytes("Неверный пароль"));
-        //                break;
-        //            case 2:
-        //                client.Send(Encoding.UTF8.GetBytes("Такого пользователя не существует"));
-        //                break;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        switch (ValidateUser.Register(str[1], str[2], _users))
-        //        {
-        //            case 0:
-        //                client.Send(Encoding.UTF8.GetBytes("Новый пользователь зарегистрирован"));
-        //                break;
-        //            case 1:
-        //                client.Send(Encoding.UTF8.GetBytes("Такой пользователь уже существует"));
-        //                break;
-        //        }
-        //    }
-
-        //}
         public static void acceptConnection(TcpClient client)
         {
             Task.Factory.StartNew(() =>
@@ -168,18 +153,15 @@ namespace Messenger.Server
                             case -1:
                                 sw.WriteLine("Неверный пароль");
                                 client.Client.Disconnect(false);
-                                //client.Send(Encoding.UTF8.GetBytes("Неверный пароль"));
                                 return;
                             case -2:
                                 sw.WriteLine("Такого пользователя не существует");
                                 client.Client.Disconnect(false);
                                 return;
-                                //client.Send(Encoding.UTF8.GetBytes("Такого пользователя не существует"));
                             default:
                                 sw.WriteLine("Вы авторизованы");
                                 _connectedUsers.Add(new ConnectedUser(_users[k], client));
-                                //recieveMessages(_connectedUsers[^1]);
-                                //client.Send(Encoding.UTF8.GetBytes("Вы авторизованы"));
+                                Console.WriteLine("Пользователь подключен: " + _users[k].Name);
                                 break;
                         }
                     }
@@ -189,6 +171,7 @@ namespace Messenger.Server
                         {
                             case 0:
                                 sw.WriteLine("Новый пользователь зарегистрирован");
+                                Console.WriteLine("Зарегестрирован пользователь: " + _users[^1].Name);
                                 _connectedUsers.Add(new ConnectedUser(_users[^1], client));
                                 break;
                             case 1:
@@ -197,8 +180,10 @@ namespace Messenger.Server
                                 return;
                         }
                     }
+                    recieveMessages(_connectedUsers[^1]);
                 }
             });
         }
+        #endregion Подключения
     }
 }

@@ -12,6 +12,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Net.Sockets;
+using System.IO;
+using Data;
 
 namespace Client
 {
@@ -20,9 +23,19 @@ namespace Client
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        TcpClient tcpClient;
+        StreamReader sr;
+        StreamWriter sw;
+        
+        public MainWindow(TcpClient tcp)
         {
             InitializeComponent();
+            tcpClient = tcp;
+            if (tcp.Connected == true)
+            {
+                sr = new(tcpClient.GetStream());
+                sw = new(tcpClient.GetStream());
+            }
         }
     }
 }

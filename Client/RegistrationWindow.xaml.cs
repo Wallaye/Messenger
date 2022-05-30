@@ -68,9 +68,9 @@ namespace Client
             string pass = LoginWindow.hashPass(pswPass1.Password);
             string str = "* " + txtLogin.Text + " " + pass;
             string reply = "";
+            TcpClient tcp = new();
             try
             {
-                TcpClient tcp = new();
                 tcp.Connect("192.168.0.115", 5500);
                 if (tcp.Connected)
                 {
@@ -100,8 +100,8 @@ namespace Client
             {
                 case "Новый пользователь зарегистрирован":
                     MessageBox.Show("Зарегестрировано успешно");
-                    //new MainWindow().Show();
-                    //this.Close();
+                    new MainWindow(tcp).Show();
+                    this.Close();
                     return;
                 case "Такой пользователь уже существует":
                     MessageBox.Show("Такой пользователь уже существует");
