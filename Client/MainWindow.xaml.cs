@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.Net.Sockets;
 using System.IO;
 using Data;
+using System.Text.Json;
 
 namespace Client
 {
@@ -26,16 +27,26 @@ namespace Client
         TcpClient tcpClient;
         StreamReader sr;
         StreamWriter sw;
+        List<string> chatNames;
         
         public MainWindow(TcpClient tcp)
         {
             InitializeComponent();
             tcpClient = tcp;
-            if (tcp.Connected == true)
+            if (tcpClient.Connected == true)
             {
                 sr = new(tcpClient.GetStream());
                 sw = new(tcpClient.GetStream());
             }
+            Task.Factory.StartNew(() =>
+            {
+                if (tcpClient.Connected == true)
+                {
+                    chatNames = sr.ReadLine().Split(" ").ToList();
+                    string Messages = sr.ReadLine();
+                    string GroupChats = sr.ReadLine();
+                }
+            });
         }
     }
 }

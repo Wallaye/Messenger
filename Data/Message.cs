@@ -11,6 +11,7 @@ namespace Data
         public string Body { get; set; }
         [DataMember]
         public DateTime Date { get; set; }
+        public Message() { }
     }
     [DataContract]
     public class MessageGroup : Message
@@ -18,23 +19,25 @@ namespace Data
         [DataMember]
         public int ID_Chat { get; set; }
         [DataMember]
-        public bool IsGroupChat { get; set; }
-        public MessageGroup(int id, bool isgc, string body, DateTime date)
+        public int[] IDS { get; set; }
+        public MessageGroup() { }
+        public MessageGroup(int id, string body, int[] ids, DateTime date)
         {
             ID_Chat = id;
-            IsGroupChat = isgc;
             Body = body;
             Date = date;
+            IDS = ids;
         }
     }
     [DataContract]
     public class PrivateMessage : Message
     {
         [DataMember]
-        public int ID_Sender;
+        public int ID_Sender { get; set; }
         [DataMember]
-        public int ID_Reciever;
+        public int ID_Reciever { get; set; }
 
+        public PrivateMessage() { }
         public PrivateMessage(int ids, int idr, string body, DateTime date)
         {
             ID_Sender = ids;

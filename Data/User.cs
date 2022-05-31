@@ -5,7 +5,7 @@ namespace Data
     public class User
     {
         [DataMember]
-        private int UserID { get; set; }
+        public int UserID { get; set; }
         [DataMember]
         public string Name { get; set; }
         [DataMember]

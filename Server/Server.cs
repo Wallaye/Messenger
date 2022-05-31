@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Json;
 using System.Text.Json;
+using System.Text;
 
 namespace Messenger.Server
 {
@@ -25,7 +26,7 @@ namespace Messenger.Server
         /// </summary>
         public static void start()
         {
-            //DeserializeUsers();
+            DeserializeUsers();
             //DeserializeMessages();
             _trdAccept.Start();
         }
@@ -96,10 +97,34 @@ namespace Messenger.Server
             {
                 try
                 {
+                    StringBuilder sb = new();
                     string str = client.sr.ReadToEnd();
-                    Message msg = JsonSerializer.Deserialize(str, typeof(Message)) as Message;
-                    if (msg != null)
-                        _messages.Add(msg);
+                    sb.Append(str);
+                    if (sb[0] == 'p')
+                    {
+                        sb.Remove(0, 1);
+                        PrivateMessage msg = JsonSerializer.Deserialize(sb.ToString(), typeof(PrivateMessage)) as PrivateMessage;
+                        if (msg != null)
+                        {
+                            _messages.Add(msg);
+                            sendMessage(msg);
+                        }
+                    }
+                    else if (sb[0] == 'g')
+                    {
+                        sb.Remove(0, 1);
+                        MessageGroup msg = JsonSerializer.Deserialize(sb.ToString(), typeof(MessageGroup)) as MessageGroup;
+                        if (msg != null)
+                        {
+                            _messages.Add(msg);
+                            sendMessage(msg);
+                        }
+                    }
+                    else if (sb[0] == 'q')
+                    {
+                        client.tcpClient.Close();
+                        _connectedUsers.Remove(client);
+                    }
                 }
                 catch (Exception exc)
                 {
@@ -108,14 +133,50 @@ namespace Messenger.Server
             }
         }
 
+        //public static void sendMessage(PrivateMessage msg)
+        //{
+        //    foreach (var el in _connectedUsers)
+        //    {
+        //        if (el.user.UserID == msg.ID_Reciever || el.user.UserID == msg.ID_Sender)
+        //        {
+        //            el.sw.WriteLine(JsonSerializer.Serialize(msg));
+        //        }
+        //    }
+        //}
+
+        //public static void sendMessage(MessageGroup msg) 
+        //{
+        //    foreach (var el in _connectedUsers)
+        //    {
+        //        if (msg.IDS.Contains(el.user.UserID))
+        //        {
+        //            el.sw.WriteLine(JsonSerializer.Serialize(msg));
+        //        }
+        //    }
+        //}
+
         public static void sendMessage(Message msg)
         {
-            
-        }
-
-        public static void sendMessages()
-        {
-            throw new NotImplementedException();
+            if (msg is MessageGroup)
+            {
+                foreach (var el in _connectedUsers)
+                {
+                    if (((MessageGroup)msg).IDS.Contains(el.user.UserID))
+                    {
+                        el.sw.WriteLine(JsonSerializer.Serialize(msg));
+                    }
+                }
+            }
+            else if (msg is PrivateMessage)
+            {
+                foreach (var el in _connectedUsers)
+                {
+                    if (el.user.UserID == ((PrivateMessage)msg).ID_Reciever || el.user.UserID == ((PrivateMessage)msg).ID_Sender)
+                    {
+                        el.sw.WriteLine(JsonSerializer.Serialize(msg));
+                    }
+                }
+            }
         }
 
         #region Подключения
@@ -180,6 +241,14 @@ namespace Messenger.Server
                                 return;
                         }
                     }
+                    StringBuilder sb = new StringBuilder();
+                    foreach (var item in _users)
+                    {
+                        sb.Append(item.Name + " ");
+                    }
+                    sb.Remove(sb.Length - 1, 1);
+                    sw.WriteLine(sb.ToString());
+                    sw.Flush();
                     recieveMessages(_connectedUsers[^1]);
                 }
             });
