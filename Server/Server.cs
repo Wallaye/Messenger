@@ -28,6 +28,7 @@ namespace Messenger.Server
         {
             DeserializeUsers();
             //DeserializeMessages();
+            //DeserializeGroups();
             _trdAccept.Start();
         }
 
@@ -37,7 +38,8 @@ namespace Messenger.Server
         public static void stop()
         {
             SerializeUsers();
-            SerializeMessages();
+            //SerializeMessages();
+            //SerializeGroups();
             Environment.Exit(0);
         }
 
@@ -85,12 +87,6 @@ namespace Messenger.Server
             }
         }
         #endregion Сериализация
-
-        public static void recieveMessage()
-        {
-            throw new NotImplementedException();
-        }
-
         public static void recieveMessages(ConnectedUser client)
         {
             while (client.tcpClient.Connected)
@@ -125,6 +121,11 @@ namespace Messenger.Server
                         client.tcpClient.Close();
                         _connectedUsers.Remove(client);
                     }
+                    else if (sb[0] == 'c')
+                    {
+                        var strs = sb.ToString().Split();
+                        _chats.Add(new(_chats.Count, strs[1..^2], strs[^1]));
+                    }
                 }
                 catch (Exception exc)
                 {
@@ -133,37 +134,15 @@ namespace Messenger.Server
             }
         }
 
-        //public static void sendMessage(PrivateMessage msg)
-        //{
-        //    foreach (var el in _connectedUsers)
-        //    {
-        //        if (el.user.UserID == msg.ID_Reciever || el.user.UserID == msg.ID_Sender)
-        //        {
-        //            el.sw.WriteLine(JsonSerializer.Serialize(msg));
-        //        }
-        //    }
-        //}
-
-        //public static void sendMessage(MessageGroup msg) 
-        //{
-        //    foreach (var el in _connectedUsers)
-        //    {
-        //        if (msg.IDS.Contains(el.user.UserID))
-        //        {
-        //            el.sw.WriteLine(JsonSerializer.Serialize(msg));
-        //        }
-        //    }
-        //}
-
         public static void sendMessage(Message msg)
         {
             if (msg is MessageGroup)
             {
                 foreach (var el in _connectedUsers)
                 {
-                    if (((MessageGroup)msg).IDS.Contains(el.user.UserID))
+                    if (((MessageGroup)msg).Names.Contains(el.user.Name))
                     {
-                        el.sw.WriteLine(JsonSerializer.Serialize(msg));
+                        el.sw.WriteLine("g"+JsonSerializer.Serialize(msg));
                     }
                 }
             }
@@ -171,10 +150,29 @@ namespace Messenger.Server
             {
                 foreach (var el in _connectedUsers)
                 {
-                    if (el.user.UserID == ((PrivateMessage)msg).ID_Reciever || el.user.UserID == ((PrivateMessage)msg).ID_Sender)
+                    if (el.user.Name == ((PrivateMessage)msg).Reciever || el.user.Name == ((PrivateMessage)msg).Sender)
                     {
-                        el.sw.WriteLine(JsonSerializer.Serialize(msg));
+                        el.sw.WriteLine("p"+JsonSerializer.Serialize(msg));
                     }
+                }
+            }
+        }
+
+        public static void SendMessagedOnConnect(ConnectedUser user)
+        {
+            StringBuilder sb = new();
+            foreach(var msg in _messages)
+            {
+                if (msg is MessageGroup)
+                {
+                    if (((MessageGroup)msg).Names.Contains(user.user.Name))
+                    {
+                        sb.Append("g" + JsonSerializer.Serialize(msg));
+                    }
+                }
+                else if (user.user.Name == ((PrivateMessage)msg).Reciever || user.user.Name == ((PrivateMessage)msg).Sender)
+                {
+                    user.sw.WriteLine("p" + JsonSerializer.Serialize(msg));
                 }
             }
         }
@@ -249,6 +247,7 @@ namespace Messenger.Server
                     sb.Remove(sb.Length - 1, 1);
                     sw.WriteLine(sb.ToString());
                     sw.Flush();
+                    SendMessagedOnConnect(_connectedUsers[^1]);
                     recieveMessages(_connectedUsers[^1]);
                 }
             });

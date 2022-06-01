@@ -6,9 +6,9 @@
         xmlns:local="clr-namespace:Client"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        ResizeMode="CanMinimize"
+        ResizeMode="NoResize"
         Title="MainWindow" Height="900" Width="1200">
     <Grid>
-
+        <Label x:Name="lblExit" Content="Х" HorizontalAlignment="Left" Height="37" Margin="1150,10,0,0" VerticalAlignment="Top" Width="25" FontSize="22" Foreground="Red" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" MouseLeftButtonDown="lblExit_MouseLeftButtonDown" Cursor="Hand"/>
     </Grid>
 </Window>

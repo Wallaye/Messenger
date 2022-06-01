@@ -19,29 +19,29 @@ namespace Data
         [DataMember]
         public int ID_Chat { get; set; }
         [DataMember]
-        public int[] IDS { get; set; }
+        public string[] Names { get; set; }
         public MessageGroup() { }
-        public MessageGroup(int id, string body, int[] ids, DateTime date)
+        public MessageGroup(int id, string body, string[] names, DateTime date)
         {
             ID_Chat = id;
             Body = body;
             Date = date;
-            IDS = ids;
+            Names = names;
         }
     }
     [DataContract]
     public class PrivateMessage : Message
     {
         [DataMember]
-        public int ID_Sender { get; set; }
+        public string Sender { get; set; }
         [DataMember]
-        public int ID_Reciever { get; set; }
+        public string Reciever { get; set; }
 
         public PrivateMessage() { }
-        public PrivateMessage(int ids, int idr, string body, DateTime date)
+        public PrivateMessage(string sender, string reciever, string body, DateTime date)
         {
-            ID_Sender = ids;
-            ID_Reciever = idr;
+            Sender = sender;
+            Reciever = reciever;
             Body = body;
             Date = date;
         }

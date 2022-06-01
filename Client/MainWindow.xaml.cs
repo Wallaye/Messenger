@@ -44,9 +44,14 @@ namespace Client
                 {
                     chatNames = sr.ReadLine().Split(" ").ToList();
                     string Messages = sr.ReadLine();
-                    string GroupChats = sr.ReadLine();
                 }
             });
+        }
+
+        private void lblExit_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            tcpClient.Close();
+            Environment.Exit(0);
         }
     }
 }

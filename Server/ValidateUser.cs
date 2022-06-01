@@ -36,7 +36,7 @@ namespace Messenger.Server
                 {
                     if (el.Name.Equals(login)) return 1;
                 }
-            users.Add(new User(users.Count, login, pass));
+            users.Add(new User(users.Count + 1, login, pass));
             return 0;
         }
     }
