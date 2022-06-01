@@ -123,7 +123,7 @@ namespace Messenger.Server
                     }
                     else if (sb[0] == 'c')
                     {
-                        var strs = sb.ToString().Split();
+                        var strs = sb.ToString().Split(" ");
                         _chats.Add(new(_chats.Count, strs[1..^2], strs[^1]));
                     }
                 }
@@ -244,10 +244,15 @@ namespace Messenger.Server
                     {
                         sb.Append(item.Name + " ");
                     }
+                    //sb.Remove(sb.Length - 1, 1);
+                    //foreach (var item in _chats)
+                    //{
+                    //    sb.Append(item.Name + " ");
+                    //}
                     sb.Remove(sb.Length - 1, 1);
                     sw.WriteLine(sb.ToString());
                     sw.Flush();
-                    SendMessagedOnConnect(_connectedUsers[^1]);
+                    //SendMessagedOnConnect(_connectedUsers[^1]);
                     recieveMessages(_connectedUsers[^1]);
                 }
             });

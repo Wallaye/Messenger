@@ -28,6 +28,7 @@ namespace Client
         StreamReader sr;
         StreamWriter sw;
         List<string> chatNames;
+        List<string> userNames;
         
         public MainWindow(TcpClient tcp)
         {
@@ -37,21 +38,53 @@ namespace Client
             {
                 sr = new(tcpClient.GetStream());
                 sw = new(tcpClient.GetStream());
+                sw.AutoFlush = true;
             }
             Task.Factory.StartNew(() =>
             {
-                if (tcpClient.Connected == true)
+                try
                 {
-                    chatNames = sr.ReadLine().Split(" ").ToList();
-                    string Messages = sr.ReadLine();
+                    if (tcpClient.Connected == true)
+                    {
+                        string str = sr.ReadLine();
+                        processFirstString(str);
+                        lstPrivateChats.ItemsSource = userNames;
+                        lstChats.ItemsSource = chatNames;
+                        string Messages = sr.ReadLine();
+                    }
+                    while (tcpClient.Connected == true)
+                    {
+                        string str = sr.ReadLine();
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
                 }
             });
         }
 
+        private void processFirstString(string str)
+        {
+            var strs = str.Split("/");
+            userNames = strs[0].Split(" ").ToList();
+            chatNames = strs[1].Split(" ").ToList();
+        }
+
         private void lblExit_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            sw.WriteLine("q");
             tcpClient.Close();
             Environment.Exit(0);
+        }
+
+        private void ReadMessage(string str)
+        {
+            if (!string.IsNullOrEmpty(str))
+            {
+
+            }
         }
     }
 }
