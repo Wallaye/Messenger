@@ -19,7 +19,7 @@
         <TextBox x:Name="txtChat" HorizontalAlignment="Left" Height="666" Margin="432,0,0,0" TextWrapping="Wrap" VerticalAlignment="Center" Width="730" FontSize="18"/>
         <TextBox x:Name="txtMessage" HorizontalAlignment="Left" Height="74" Margin="432,800,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="542" FontSize="18"/>
         <Button x:Name="btnSend" Content="Отправить" HorizontalAlignment="Left" Height="38" Margin="1001,818,0,0" VerticalAlignment="Top" Width="161" Background="#FF9CB4FF" FontSize="18"/>
-        <Button x:Name="btnCreateGroup" Content="Создать групповой чат" HorizontalAlignment="Left" Height="38" Margin="84,818,0,0" VerticalAlignment="Top" Width="244" FontSize="18"/>
+        <Button x:Name="btnCreateGroup" Content="Создать групповой чат" HorizontalAlignment="Left" Height="38" Margin="84,818,0,0" VerticalAlignment="Top" Width="244" FontSize="18" Click="btnCreateGroup_Click"/>
         <ListBox x:Name="lstPrivateChats" HorizontalAlignment="Left" Height="285" Margin="44,109,0,0" VerticalAlignment="Top" Width="324" FontSize="18"/>
         <Label Content="Пользователи" HorizontalAlignment="Left" Height="33" Margin="44,71,0,0" VerticalAlignment="Top" Width="324" FontSize="18" HorizontalContentAlignment="Center"/>
         <Label Content="Сообщения" HorizontalAlignment="Left" Height="33" Margin="432,71,0,0" VerticalAlignment="Top" Width="730" FontSize="18" HorizontalContentAlignment="Center"/>

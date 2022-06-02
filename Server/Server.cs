@@ -10,7 +10,7 @@ namespace Messenger.Server
     static class Server
     {
         private static readonly Thread _trdAccept = new Thread(acceptConnections);
-        private static readonly IPAddress _defaultIPAdress = IPAddress.Parse("192.168.0.115");
+        private static readonly IPAddress _defaultIPAdress = IPAddress.Any;//IPAddress.Parse("192.168.0.115");
         private static readonly List<ConnectedUser> _connectedUsers = new List<ConnectedUser>();
         private static readonly int _port = 5500;
         private static List<User> _users = new List<User>();
@@ -27,7 +27,7 @@ namespace Messenger.Server
         public static void start()
         {
             DeserializeUsers();
-            //DeserializeMessages();
+            DeserializeMessages();
             //DeserializeGroups();
             _trdAccept.Start();
         }
@@ -38,7 +38,7 @@ namespace Messenger.Server
         public static void stop()
         {
             SerializeUsers();
-            //SerializeMessages();
+            SerializeMessages();
             //SerializeGroups();
             Environment.Exit(0);
         }
@@ -67,7 +67,7 @@ namespace Messenger.Server
         }
         public static void DeserializeMessages()
         {
-            using (var file = new FileStream(@"..\..\..\JSON\Messages.json", FileMode.Create))
+            using (var file = new FileStream(@"..\..\..\JSON\Messages.json", FileMode.Open))
             {
                 _messages = _msgSer.ReadObject(file) as List<Message>;
             }
@@ -81,7 +81,7 @@ namespace Messenger.Server
         }
         public static void DeserializeGroups()
         {
-            using (var file = new FileStream(@"..\..\..\JSON\GroupChats.json", FileMode.Create))
+            using (var file = new FileStream(@"..\..\..\JSON\GroupChats.json", FileMode.Open))
             {
                 _chats = _grpSer.ReadObject(file) as List<GroupChat>;
             }
@@ -94,7 +94,7 @@ namespace Messenger.Server
                 try
                 {
                     StringBuilder sb = new();
-                    string str = client.sr.ReadToEnd();
+                    string str = client.sr.ReadLine();
                     sb.Append(str);
                     if (sb[0] == 'p')
                     {
@@ -119,12 +119,18 @@ namespace Messenger.Server
                     else if (sb[0] == 'q')
                     {
                         client.tcpClient.Close();
+                        int i = _connectedUsers.IndexOf(client);
+                        Console.WriteLine(_connectedUsers[i].user.Name + " отключился");
                         _connectedUsers.Remove(client);
                     }
                     else if (sb[0] == 'c')
                     {
                         var strs = sb.ToString().Split(" ");
                         _chats.Add(new(_chats.Count, strs[1..^2], strs[^1]));
+                        foreach (var el in _connectedUsers)
+                        {
+                            el.sw.WriteLine("c" + JsonSerializer.Serialize(_chats[^1]));
+                        }
                     }
                 }
                 catch (Exception exc)
@@ -158,7 +164,7 @@ namespace Messenger.Server
             }
         }
 
-        public static void SendMessagedOnConnect(ConnectedUser user)
+        public static void SendMessagesOnConnect(ConnectedUser user)
         {
             StringBuilder sb = new();
             foreach(var msg in _messages)
@@ -167,13 +173,18 @@ namespace Messenger.Server
                 {
                     if (((MessageGroup)msg).Names.Contains(user.user.Name))
                     {
-                        sb.Append("g" + JsonSerializer.Serialize(msg));
+                        sb.Append("g" + JsonSerializer.Serialize(msg) + " ");
                     }
                 }
                 else if (user.user.Name == ((PrivateMessage)msg).Reciever || user.user.Name == ((PrivateMessage)msg).Sender)
                 {
-                    user.sw.WriteLine("p" + JsonSerializer.Serialize(msg));
+                    sb.Append("p" + JsonSerializer.Serialize(msg));
                 }
+            }
+            if (sb.Length > 0)
+            {
+                sb.Remove(sb.Length - 1, 1);
+                user.sw.WriteLine(sb.ToString());
             }
         }
 
@@ -204,6 +215,7 @@ namespace Messenger.Server
                     var sw = new StreamWriter(client.GetStream());
                     sw.AutoFlush = true;
                     var words = sr.ReadLine().Split(" ");
+                    ConnectedUser usr = null;
                     if (words.Length == 2)
                     {
                         int k = ValidateUser.Authorize(words[0], words[1], _users);
@@ -219,7 +231,8 @@ namespace Messenger.Server
                                 return;
                             default:
                                 sw.WriteLine("Вы авторизованы");
-                                _connectedUsers.Add(new ConnectedUser(_users[k], client));
+                                usr = new(_users[k], client);
+                                _connectedUsers.Add(usr);
                                 Console.WriteLine("Пользователь подключен: " + _users[k].Name);
                                 break;
                         }
@@ -231,7 +244,8 @@ namespace Messenger.Server
                             case 0:
                                 sw.WriteLine("Новый пользователь зарегистрирован");
                                 Console.WriteLine("Зарегестрирован пользователь: " + _users[^1].Name);
-                                _connectedUsers.Add(new ConnectedUser(_users[^1], client));
+                                usr = new(_users[^1], client);
+                                _connectedUsers.Add(usr);
                                 break;
                             case 1:
                                 sw.WriteLine("Такой пользователь уже существует");
@@ -244,16 +258,21 @@ namespace Messenger.Server
                     {
                         sb.Append(item.Name + " ");
                     }
-                    //sb.Remove(sb.Length - 1, 1);
-                    //foreach (var item in _chats)
-                    //{
-                    //    sb.Append(item.Name + " ");
-                    //}
                     sb.Remove(sb.Length - 1, 1);
-                    sw.WriteLine(sb.ToString());
+                    sw.WriteLine(sb.ToString());//Отправляем имена пользователей
+                    sb.Clear();
+                    SendMessagesOnConnect(usr);//Отправляем сообщения подключённому пользователю
+                    foreach (var item in _chats)
+                    {
+                        if (item.Users.Contains(usr.user.Name))
+                        {
+                            sb.Append(JsonSerializer.Serialize(item) + " ");
+                        }
+                    }
+                    if (sb.Length > 0) sb.Remove(sb.Length - 1, 1);
+                    sw.WriteLine(sb.ToString());//Отправляем групповые чаты к которым принадлежит данный пользователь
                     sw.Flush();
-                    //SendMessagedOnConnect(_connectedUsers[^1]);
-                    recieveMessages(_connectedUsers[^1]);
+                    recieveMessages(usr);
                 }
             });
         }
