@@ -1,19 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Net.Sockets;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Net.Sockets;
+using System.Text;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace Client
 {
@@ -25,38 +16,57 @@ namespace Client
         ObservableCollection<string> users;
         ObservableCollection<string> chosenUsers;
         TcpClient tcpClient;
-        public CreateGroupChat(ObservableCollection<string> users, TcpClient tcpClient)
+        StreamWriter sw;
+        public CreateGroupChat(List<string> users, StreamWriter sw)
         {
             InitializeComponent();
             this.users = new(users);
             this.chosenUsers = new();
-            this.tcpClient = tcpClient;
+            //this.tcpClient = tcpClient;
+            this.sw = sw;
             lstChosen.ItemsSource = chosenUsers;
-            lstUsers.ItemsSource = users;
+            lstUsers.ItemsSource = this.users;
             lstChosen.SelectionMode = SelectionMode.Multiple;
             lstUsers.SelectionMode = SelectionMode.Multiple;
         }
 
         private void btnMove_Click(object sender, RoutedEventArgs e)
         {
-            List<string> chosen1 = (List<string>)lstChosen.SelectedItems;
-            List<string> chosen2 = (List<string>)lstUsers.SelectedItems;
-            foreach (var item in chosen2)
-            {
-                int deleteIndex = lstUsers.Items.IndexOf(item);
-                users.RemoveAt(deleteIndex);
-                chosenUsers.Add(item);
-                //lstUsers.Items.RemoveAt(deleteIndex);
-                //lstChosen.Items.Add(item);
-            }
+            var chosen2 = lstChosen.SelectedItems;
+            var chosen1 = lstUsers.SelectedItems;
+            var _users = new ObservableCollection<string>(users);
+            var _chosenusers = new ObservableCollection<string>(chosenUsers);
             foreach (var item in chosen1)
             {
-                int deleteIndex = lstChosen.Items.IndexOf(item);
-                chosenUsers.RemoveAt(deleteIndex);
-                users.Add(item);
-                //lstChosen.Items.RemoveAt(deleteIndex);
-                //lstUsers.Items.Add(item);
+                string curr = (string)item;
+                _chosenusers.Add(curr);
+                _users.Remove(curr);
             }
+            foreach (var item in chosen2)
+            {
+                string curr = (string)item;
+                _users.Add(curr);
+                _chosenusers.Remove(curr);
+            }
+
+            //string str;
+            //foreach (var item in users)
+            //{
+            //    int deleteIndex = _users.IndexOf(item);
+            //    _chosenusers.Add(users[deleteIndex]);
+            //    _users.RemoveAt(deleteIndex);
+            //}
+            //foreach (var item in chosenUsers)
+            //{
+            //    int deleteIndex = lstChosen.Items.IndexOf(item);
+            //    _users.Add(chosenUsers[deleteIndex]);
+            //    _chosenusers.RemoveAt(deleteIndex);
+            //}
+            users = _users;
+            chosenUsers = _chosenusers;
+            lstChosen.ItemsSource = chosenUsers;
+            lstUsers.ItemsSource = users;
+
         }
 
         private void btnCreate_Click(object sender, RoutedEventArgs e)
@@ -65,16 +75,20 @@ namespace Client
             {
                 MessageBox.Show("Невозможно создать чат меньше чем из 3 пользователей");
             }
+            else if (string.IsNullOrWhiteSpace(txtName.Text))
+            {
+                MessageBox.Show("Введите название чата");
+            }
             else
             {
-                StreamWriter sw = new StreamWriter(tcpClient.GetStream());
+                //StreamWriter sw = new StreamWriter(tcpClient.GetStream());
                 StringBuilder sb = new StringBuilder();
                 sb.Append("c ");
-                foreach(var item in chosenUsers)
+                foreach (var item in chosenUsers)
                 {
                     sb.Append(item + " ");
                 }
-                sb.Remove(sb.Length - 1, 1);
+                sb.Append(txtName.Text);
                 sw.WriteLine(sb.ToString());
                 this.Close();
             }

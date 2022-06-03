@@ -99,7 +99,7 @@ namespace Client
                     return;
                 case "Вы авторизованы":
                     MessageBox.Show("Вы авторизованы");
-                    new MainWindow(tcp).Show();
+                    new MainWindow(tcp, txtLogin.Text).Show();
                     this.Close();
                     break;
             }

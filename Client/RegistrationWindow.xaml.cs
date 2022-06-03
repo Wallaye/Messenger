@@ -90,6 +90,7 @@ namespace Client
             catch (SocketException exc)
             {
                 MessageBox.Show("Возникла ошибка при подключении к серверу\n" + exc.Message);
+                return;
             }
             catch (Exception ex)
             {
@@ -100,7 +101,7 @@ namespace Client
             {
                 case "Новый пользователь зарегистрирован":
                     MessageBox.Show("Зарегестрировано успешно");
-                    new MainWindow(tcp).Show();
+                    new MainWindow(tcp, txtLogin.Text).Show();
                     this.Close();
                     return;
                 case "Такой пользователь уже существует":

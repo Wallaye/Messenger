@@ -17,6 +17,7 @@ using System.IO;
 using Data;
 using System.Text.Json;
 using System.Collections.ObjectModel;
+using System.Threading;
 
 namespace Client
 {
@@ -25,6 +26,7 @@ namespace Client
     /// </summary>
     public partial class MainWindow : Window
     {
+        string curr_name;
         TcpClient tcpClient;
         StreamReader sr;
         StreamWriter sw;
@@ -32,13 +34,22 @@ namespace Client
         List<GroupChat> usersGrpChats = new List<GroupChat>();
         ObservableCollection<string> userNames = new ObservableCollection<string>();
         List<Message> messages = new List<Message>();
+        public enum choice{
+            Nothing = -1,
+            Private = 0,
+            Group = 1
+        }
+        choice _choice = MainWindow.choice.Nothing;
+        SynchronizationContext UIContext;
         
-        public MainWindow(TcpClient tcp)
+        public MainWindow(TcpClient tcp, string curr_name)
         {
             InitializeComponent();
+            this.curr_name = curr_name;
             tcpClient = tcp;
             lstPrivateChats.ItemsSource = userNames;
             lstChats.ItemsSource = chatNames;
+            UIContext = SynchronizationContext.Current;
             if (tcpClient.Connected == true)
             {
                 sr = new(tcpClient.GetStream());
@@ -51,11 +62,16 @@ namespace Client
                 {
                     if (tcpClient.Connected == true)
                     {
+                        Task.Delay(30).Wait();
+
                         string str = sr.ReadLine();
                         var _userNames = str.Split(" ").ToList();
-                        foreach (var item in _userNames)
+                        if (UIContext != null)
                         {
-                            userNames.Add(item);
+                            foreach (var item in _userNames)
+                            {
+                                UIContext.Send(x => userNames.Add(item), null);
+                            }
                         }
                         string Messages = sr.ReadLine();
                         processFirstMsgs(Messages);
@@ -75,6 +91,9 @@ namespace Client
                         ReadMessage();
                         Task.Delay(20).Wait();
                     }
+                    //MessageBox.Show("Разрыв соединения с сервером");
+                    btnCreateGroup.IsEnabled = false;
+                    btnSend.IsEnabled = false;
                 }
                 catch (Exception ex)
                 {
@@ -105,7 +124,7 @@ namespace Client
         {
             if (!String.IsNullOrEmpty(str))
             {
-                var strs = str.Split(" ");
+                var strs = str.Split("*^&%");
                 foreach (var item in strs)
                 {
                     if (item[0] == 'g')
@@ -134,23 +153,115 @@ namespace Client
             {
                 if (str[0] == 'g')
                 {
-                    messages.Add(JsonSerializer.Deserialize(str[1..], typeof(MessageGroup)) as MessageGroup);
+                    MessageGroup msg = JsonSerializer.Deserialize(str[1..], typeof(MessageGroup)) as MessageGroup;
+                    messages.Add(msg);
+                    string selected = null;
+                    Dispatcher.Invoke(() => selected = (string)lstPrivateChats.SelectedValue);
+                    if (msg.Names.Contains(selected))
+                    {
+                        UIContext.Send(x => txtChat.Text += $"{msg.Sender}({msg.Date.ToLocalTime()}): {msg.Body}\n", null);
+                    }
+
                 }
                 else if (str[0] == 'p')
                 {
-                    messages.Add(JsonSerializer.Deserialize(str[1..], typeof(PrivateMessage)) as PrivateMessage);
+                    PrivateMessage msg = JsonSerializer.Deserialize(str[1..], typeof(PrivateMessage)) as PrivateMessage;
+                    messages.Add(msg);
+                    string selected = null;
+                    Dispatcher.Invoke(() => selected = (string)lstPrivateChats.SelectedValue);
+                    if (msg.Sender == selected || msg.Reciever == selected)
+                    {
+                        UIContext.Send(x => txtChat.Text += $"{msg.Sender}({msg.Date.ToLocalTime()}): {msg.Body}\n", null);
+                    }
                 }
                 else if (str[0] == 'c')
                 {
                     usersGrpChats.Add(JsonSerializer.Deserialize(str[1..], typeof(GroupChat)) as GroupChat);
-                    chatNames.Add(usersGrpChats[^1].Name);
+                    UIContext.Send(x => chatNames.Add(usersGrpChats[^1].Name), null);
+                }
+                else if (str[0] == 'n')
+                {
+                    UIContext.Send(x => userNames.Add(str[2..]), null);
                 }
             }
         }
 
         private void btnCreateGroup_Click(object sender, RoutedEventArgs e)
         {
-            Task.Factory.StartNew(() => { (new CreateGroupChat(userNames, tcpClient)).Show(); });
+            List<string> names = new List<string>(userNames);
+            names.Add(curr_name);
+            (new CreateGroupChat(names, sw)).Show();
+        }
+
+        private void lstPrivateChats_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            lstChats.UnselectAll();
+            txtChat.Text = "";
+            _choice = choice.Private;
+            foreach (var item in messages)
+            {
+                var msg = item as PrivateMessage;
+                if (msg is not null) 
+                {
+                    string selected = (string)lstPrivateChats.SelectedValue;
+                    if (msg.Sender == selected || msg.Reciever == selected)
+                    {
+                        txtChat.Text += $"{msg.Sender}({msg.Date.ToLocalTime()}): {msg.Body}\n";
+                    }
+                }
+            }
+        }
+
+        private void lstChats_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            lstPrivateChats.UnselectAll();
+            txtChat.Text = "";
+            _choice = choice.Group;
+            foreach (var item in messages)
+            {
+                var msg = item as MessageGroup;
+                if (msg is not null)
+                {
+                    string selected = (string)lstPrivateChats.SelectedValue;
+                    if (msg.Names.Contains(selected))
+                    {
+                        txtChat.Text += $"{msg.Sender}({msg.Date.ToLocalTime()}): {msg.Body}\n";
+                    }
+                }
+            }
+        }
+
+        private void btnSend_Click(object sender, RoutedEventArgs e)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                Message msg;
+                string msgBody = null;
+                Dispatcher.Invoke(() => msgBody = txtMessage.Text);
+                if (!string.IsNullOrWhiteSpace(msgBody))
+                {
+                    switch (_choice)
+                    {
+                        case choice.Nothing:
+                            break;
+                        case choice.Private:
+                            string selected = null;
+                            Dispatcher.Invoke(() => selected = (string)lstPrivateChats.SelectedValue);
+                            msg = new PrivateMessage(curr_name, selected, msgBody, DateTime.Now);
+                            sw.WriteLine("p" + JsonSerializer.Serialize(msg, typeof(PrivateMessage)));
+                            break;
+                        case choice.Group:
+                            int? index = null;
+                            Dispatcher.Invoke(() => index = lstChats.SelectedIndex);
+                            GroupChat temp = usersGrpChats[index.Value];
+                            msg = new MessageGroup(temp.ID_Chat, msgBody, temp.Users, curr_name, DateTime.Now);
+                            sw.WriteLine("g" + JsonSerializer.Serialize(msg, typeof(MessageGroup)));
+                            break;
+                    }
+                }
+                else MessageBox.Show("Нельзя отправить пустое сообщение");
+                UIContext.Send(x => txtMessage.Text = String.Empty, null);
+            });
         }
     }
 }

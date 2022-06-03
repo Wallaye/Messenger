@@ -28,7 +28,7 @@ namespace Messenger.Server
         {
             DeserializeUsers();
             DeserializeMessages();
-            //DeserializeGroups();
+            DeserializeGroups();
             _trdAccept.Start();
         }
 
@@ -39,7 +39,7 @@ namespace Messenger.Server
         {
             SerializeUsers();
             SerializeMessages();
-            //SerializeGroups();
+            SerializeGroups();
             Environment.Exit(0);
         }
 
@@ -96,12 +96,14 @@ namespace Messenger.Server
                     StringBuilder sb = new();
                     string str = client.sr.ReadLine();
                     sb.Append(str);
+                    if (sb.Length == 0) sb.Append('q');
                     if (sb[0] == 'p')
                     {
                         sb.Remove(0, 1);
                         PrivateMessage msg = JsonSerializer.Deserialize(sb.ToString(), typeof(PrivateMessage)) as PrivateMessage;
                         if (msg != null)
                         {
+                            Console.WriteLine(client.user.Name + " написал личное сообщение");
                             _messages.Add(msg);
                             sendMessage(msg);
                         }
@@ -112,6 +114,7 @@ namespace Messenger.Server
                         MessageGroup msg = JsonSerializer.Deserialize(sb.ToString(), typeof(MessageGroup)) as MessageGroup;
                         if (msg != null)
                         {
+                            Console.WriteLine(client.user.Name + " написал групповое сообщение");
                             _messages.Add(msg);
                             sendMessage(msg);
                         }
@@ -127,11 +130,13 @@ namespace Messenger.Server
                     {
                         var strs = sb.ToString().Split(" ");
                         _chats.Add(new(_chats.Count, strs[1..^2], strs[^1]));
+                        Console.WriteLine(client.user.Name + " создал групповой чат ");
                         foreach (var el in _connectedUsers)
                         {
                             el.sw.WriteLine("c" + JsonSerializer.Serialize(_chats[^1]));
                         }
                     }
+                    Task.Delay(10).Wait();
                 }
                 catch (Exception exc)
                 {
@@ -148,7 +153,7 @@ namespace Messenger.Server
                 {
                     if (((MessageGroup)msg).Names.Contains(el.user.Name))
                     {
-                        el.sw.WriteLine("g"+JsonSerializer.Serialize(msg));
+                        el.sw.WriteLine("g"+JsonSerializer.Serialize(msg, typeof(MessageGroup)));
                     }
                 }
             }
@@ -158,9 +163,18 @@ namespace Messenger.Server
                 {
                     if (el.user.Name == ((PrivateMessage)msg).Reciever || el.user.Name == ((PrivateMessage)msg).Sender)
                     {
-                        el.sw.WriteLine("p"+JsonSerializer.Serialize(msg));
+                        el.sw.WriteLine("p"+JsonSerializer.Serialize(msg, typeof(PrivateMessage)));
                     }
                 }
+            }
+        }
+        
+        public static void newUserConnected(string str)
+        {
+            foreach (var el in _connectedUsers)
+            {
+                if (el.user.Name != str)
+                    el.sw.WriteLine("n " + str);
             }
         }
 
@@ -173,17 +187,17 @@ namespace Messenger.Server
                 {
                     if (((MessageGroup)msg).Names.Contains(user.user.Name))
                     {
-                        sb.Append("g" + JsonSerializer.Serialize(msg) + " ");
+                        sb.Append("g" + JsonSerializer.Serialize(msg, typeof(MessageGroup)) + "*^&%");
                     }
                 }
                 else if (user.user.Name == ((PrivateMessage)msg).Reciever || user.user.Name == ((PrivateMessage)msg).Sender)
                 {
-                    sb.Append("p" + JsonSerializer.Serialize(msg));
+                    sb.Append("p" + JsonSerializer.Serialize(msg, typeof(PrivateMessage)) + "*^&%");
                 }
             }
-            if (sb.Length > 0)
+            if (sb.Length > 4)
             {
-                sb.Remove(sb.Length - 1, 1);
+                sb.Remove(sb.Length - 4, 4);
                 user.sw.WriteLine(sb.ToString());
             }
         }
@@ -245,6 +259,7 @@ namespace Messenger.Server
                                 sw.WriteLine("Новый пользователь зарегистрирован");
                                 Console.WriteLine("Зарегестрирован пользователь: " + _users[^1].Name);
                                 usr = new(_users[^1], client);
+                                newUserConnected(usr.user.Name);
                                 _connectedUsers.Add(usr);
                                 break;
                             case 1:
@@ -256,7 +271,8 @@ namespace Messenger.Server
                     StringBuilder sb = new StringBuilder();
                     foreach (var item in _users)
                     {
-                        sb.Append(item.Name + " ");
+                        if (item.Name != usr.user.Name)
+                            sb.Append(item.Name + " ");
                     }
                     sb.Remove(sb.Length - 1, 1);
                     sw.WriteLine(sb.ToString());//Отправляем имена пользователей

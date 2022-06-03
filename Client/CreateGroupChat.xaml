@@ -5,19 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Client"
         mc:Ignorable="d"
-        WindowStartupLocation="CenterScreen"
         ResizeMode="CanMinimize"
-        Title="CreateGroupChat" Height="400" Width="650">
+        WindowStartupLocation="CenterScreen"
+        Title="CreateGroupChat" Height="468" Width="650">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="571*"/>
-            <ColumnDefinition Width="79*"/>
-        </Grid.ColumnDefinitions>
-        <ListBox x:Name="lstUsers" HorizontalAlignment="Left" Height="280" Margin="33,0,0,0" VerticalAlignment="Center" Width="226" FontSize="18"/>
-        <ListBox x:Name="lstChosen" HorizontalAlignment="Left" Height="280" Margin="391,0,0,0" VerticalAlignment="Center" Width="235" FontSize="18" Grid.ColumnSpan="2"/>
-        <Button x:Name="btnCreate" Content="Создать" HorizontalAlignment="Left" Margin="276,346,0,0" VerticalAlignment="Top" FontSize="16" Width="98" Click="btnCreate_Click"/>
+        <ListBox x:Name="lstUsers" HorizontalAlignment="Left" Height="280" Margin="33,57,0,0" VerticalAlignment="Top" Width="226" FontSize="18"/>
+        <ListBox x:Name="lstChosen" HorizontalAlignment="Left" Height="280" Margin="391,57,0,0" VerticalAlignment="Top" Width="235" FontSize="18"/>
+        <Button x:Name="btnCreate" Content="Создать" HorizontalAlignment="Center" Margin="0,312,0,0" VerticalAlignment="Top" FontSize="16" Width="98" Click="btnCreate_Click"/>
         <Label Content="Пользователи" HorizontalAlignment="Left" Height="42" Margin="33,10,0,0" VerticalAlignment="Top" Width="226" FontSize="18" VerticalContentAlignment="Bottom" HorizontalContentAlignment="Center"/>
-        <Label Content="Выбранные пользователи" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="36" Margin="391,16,0,0" VerticalAlignment="Top" Width="235" FontSize="18" HorizontalContentAlignment="Center"/>
-        <Button x:Name="btnMove" Content="Перенести" HorizontalAlignment="Left" Height="32" Margin="273,160,0,0" VerticalAlignment="Top" Width="104" FontSize="16" Click="btnMove_Click"/>
+        <Label Content="Выбранные пользователи" HorizontalAlignment="Left" Height="36" Margin="391,16,0,0" VerticalAlignment="Top" Width="235" FontSize="18" HorizontalContentAlignment="Center"/>
+        <Button x:Name="btnMove" Content="Перенести" HorizontalAlignment="Center" Height="32" Margin="0,259,0,0" VerticalAlignment="Top" Width="104" FontSize="16" Click="btnMove_Click"/>
+        <TextBox x:Name="txtName" HorizontalAlignment="Left" Height="41" Margin="339,353,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="287" FontSize="18"/>
+        <Label Content="Введите имя чата" HorizontalAlignment="Left" Height="41" Margin="67,353,0,0" VerticalAlignment="Top" Width="267" FontSize="18" HorizontalContentAlignment="Right"/>
     </Grid>
 </Window>
