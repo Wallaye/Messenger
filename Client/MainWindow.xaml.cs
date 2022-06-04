@@ -95,6 +95,10 @@ namespace Client
                     btnCreateGroup.IsEnabled = false;
                     btnSend.IsEnabled = false;
                 }
+                catch (SocketException ex)
+                {
+                    MessageBox.Show("Разрыв соединения с сервером");
+                }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message);
