@@ -110,6 +110,10 @@ namespace Client
         {
             if (!String.IsNullOrEmpty(str))
             {
+                if (str[0] == 'r')
+                {
+                    return;
+                }
                 var strs = str.Split(" ");
                 GroupChat temp;
                 foreach (var item in strs)
@@ -223,7 +227,7 @@ namespace Client
                     }
                 }
             }
-            
+            btnInfo.Visibility = Visibility.Collapsed;
         }
 
         private void lstChats_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -247,7 +251,7 @@ namespace Client
                     }
                 }
             }
-                
+            btnInfo.Visibility = Visibility.Visible;
         }
 
         private void btnSend_Click(object sender, RoutedEventArgs e)
@@ -283,6 +287,22 @@ namespace Client
                 else MessageBox.Show("Нельзя отправить пустое сообщение");
                 UIContext.Send(x => txtMessage.Text = String.Empty, null);
             });
+        }
+
+        private void btnInfo_Click(object sender, RoutedEventArgs e)
+        {
+            int selected = lstChats.SelectedIndex;
+            StringBuilder sb = new();
+            if (selected >= 0)
+            {
+                sb.Append("Участники:\n");
+                foreach (var item in usersGrpChats[selected].Users)
+                {
+                    sb.Append(item + ", ");
+                }
+                sb.Remove(sb.Length - 2, 2);
+                MessageBox.Show(sb.ToString());
+            }
         }
     }
 }

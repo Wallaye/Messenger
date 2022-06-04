@@ -200,6 +200,10 @@ namespace Messenger.Server
                 sb.Remove(sb.Length - 4, 4);
                 user.sw.WriteLine(sb.ToString());
             }
+            else
+            {
+                user.sw.WriteLine("r");
+            }
         }
 
         #region Подключения
