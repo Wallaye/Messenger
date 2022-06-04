@@ -115,7 +115,7 @@ namespace Client
                 }
                 foreach (var item in usersGrpChats)
                 {
-                    chatNames.Add(item.Name);
+                    UIContext.Send(x =>chatNames.Add(item.Name), null);
                 }
             }
         }
@@ -141,9 +141,13 @@ namespace Client
 
         private void lblExit_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            sw.WriteLine("q");
-            tcpClient.Close();
-            Environment.Exit(0);
+            try
+            {
+                sw.WriteLine("q");
+                tcpClient.Close();
+                Environment.Exit(0);
+            }
+            catch { };
         }
 
         private void ReadMessage()
@@ -155,13 +159,15 @@ namespace Client
                 {
                     MessageGroup msg = JsonSerializer.Deserialize(str[1..], typeof(MessageGroup)) as MessageGroup;
                     messages.Add(msg);
-                    string selected = null;
-                    Dispatcher.Invoke(() => selected = (string)lstPrivateChats.SelectedValue);
-                    if (msg.Names.Contains(selected))
+                    int selected = 0;
+                    Dispatcher.Invoke(() => selected = lstPrivateChats.SelectedIndex);
+                    if (selected >= 0)
                     {
-                        UIContext.Send(x => txtChat.Text += $"{msg.Sender}({msg.Date.ToLocalTime()}): {msg.Body}\n", null);
+                        if (msg.ID_Chat == usersGrpChats[selected].ID_Chat)
+                        {
+                            UIContext.Send(x => txtChat.Text += $"{msg.Sender}({msg.Date.ToLocalTime()}): {msg.Body}\n", null);
+                        }
                     }
-
                 }
                 else if (str[0] == 'p')
                 {
@@ -189,8 +195,8 @@ namespace Client
         private void btnCreateGroup_Click(object sender, RoutedEventArgs e)
         {
             List<string> names = new List<string>(userNames);
-            names.Add(curr_name);
-            (new CreateGroupChat(names, sw)).Show();
+            //names.Add(curr_name);
+            (new CreateGroupChat(names, ref this.tcpClient, curr_name)).Show();
         }
 
         private void lstPrivateChats_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -198,18 +204,22 @@ namespace Client
             lstChats.UnselectAll();
             txtChat.Text = "";
             _choice = choice.Private;
-            foreach (var item in messages)
+            string selected = (string)lstPrivateChats.SelectedValue;
+            if (!String.IsNullOrEmpty(selected))
             {
-                var msg = item as PrivateMessage;
-                if (msg is not null) 
+                foreach (var item in messages)
                 {
-                    string selected = (string)lstPrivateChats.SelectedValue;
-                    if (msg.Sender == selected || msg.Reciever == selected)
+                    var msg = item as PrivateMessage;
+                    if (msg is not null)
                     {
-                        txtChat.Text += $"{msg.Sender}({msg.Date.ToLocalTime()}): {msg.Body}\n";
+                        if (msg.Sender == selected || msg.Reciever == selected)
+                        {
+                            txtChat.Text += $"{msg.Sender}({msg.Date.ToLocalTime()}): {msg.Body}\n";
+                        }
                     }
                 }
             }
+            
         }
 
         private void lstChats_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -217,18 +227,23 @@ namespace Client
             lstPrivateChats.UnselectAll();
             txtChat.Text = "";
             _choice = choice.Group;
-            foreach (var item in messages)
+            int selected = lstChats.SelectedIndex;
+            if (selected >= 0)
             {
-                var msg = item as MessageGroup;
-                if (msg is not null)
+                foreach (var item in messages)
                 {
-                    string selected = (string)lstPrivateChats.SelectedValue;
-                    if (msg.Names.Contains(selected))
+                    var msg = item as MessageGroup;
+                    if (msg is not null)
                     {
-                        txtChat.Text += $"{msg.Sender}({msg.Date.ToLocalTime()}): {msg.Body}\n";
+
+                        if (msg.ID_Chat == usersGrpChats[selected].ID_Chat)
+                        {
+                            txtChat.Text += $"{msg.Sender}({msg.Date.ToLocalTime()}): {msg.Body}\n";
+                        }
                     }
                 }
             }
+                
         }
 
         private void btnSend_Click(object sender, RoutedEventArgs e)
@@ -249,6 +264,7 @@ namespace Client
                             Dispatcher.Invoke(() => selected = (string)lstPrivateChats.SelectedValue);
                             msg = new PrivateMessage(curr_name, selected, msgBody, DateTime.Now);
                             sw.WriteLine("p" + JsonSerializer.Serialize(msg, typeof(PrivateMessage)));
+                            //sw.Flush();
                             break;
                         case choice.Group:
                             int? index = null;
@@ -256,6 +272,7 @@ namespace Client
                             GroupChat temp = usersGrpChats[index.Value];
                             msg = new MessageGroup(temp.ID_Chat, msgBody, temp.Users, curr_name, DateTime.Now);
                             sw.WriteLine("g" + JsonSerializer.Serialize(msg, typeof(MessageGroup)));
+                            //sw.Flush();
                             break;
                     }
                 }

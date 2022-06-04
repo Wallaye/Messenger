@@ -10,11 +10,12 @@ namespace Data
         public string[] Users { get; set; }
         [DataMember]
         public string Name { get; set; }
-        public GroupChat(int ID, string[] list, string name)
+        public GroupChat(int id_chat, string[] users, string name)
         {
-            ID_Chat = ID;
-            Users = list;
+            ID_Chat = id_chat;
+            Users = users;
             Name = name;
         }
+        public GroupChat() { }
     }
 }

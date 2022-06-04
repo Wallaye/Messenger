@@ -15,15 +15,18 @@ namespace Client
     {
         ObservableCollection<string> users;
         ObservableCollection<string> chosenUsers;
+        string curr_name;
         TcpClient tcpClient;
         StreamWriter sw;
-        public CreateGroupChat(List<string> users, StreamWriter sw)
+        public CreateGroupChat(List<string> users, ref TcpClient tcpClient, string curr_name)
         {
             InitializeComponent();
             this.users = new(users);
             this.chosenUsers = new();
-            //this.tcpClient = tcpClient;
-            this.sw = sw;
+            this.tcpClient = tcpClient;
+            sw = new(tcpClient.GetStream());
+            this.curr_name = curr_name;
+            //this.sw = sw;
             lstChosen.ItemsSource = chosenUsers;
             lstUsers.ItemsSource = this.users;
             lstChosen.SelectionMode = SelectionMode.Multiple;
@@ -49,24 +52,10 @@ namespace Client
                 _chosenusers.Remove(curr);
             }
 
-            //string str;
-            //foreach (var item in users)
-            //{
-            //    int deleteIndex = _users.IndexOf(item);
-            //    _chosenusers.Add(users[deleteIndex]);
-            //    _users.RemoveAt(deleteIndex);
-            //}
-            //foreach (var item in chosenUsers)
-            //{
-            //    int deleteIndex = lstChosen.Items.IndexOf(item);
-            //    _users.Add(chosenUsers[deleteIndex]);
-            //    _chosenusers.RemoveAt(deleteIndex);
-            //}
             users = _users;
             chosenUsers = _chosenusers;
             lstChosen.ItemsSource = chosenUsers;
             lstUsers.ItemsSource = users;
-
         }
 
         private void btnCreate_Click(object sender, RoutedEventArgs e)
@@ -84,12 +73,14 @@ namespace Client
                 //StreamWriter sw = new StreamWriter(tcpClient.GetStream());
                 StringBuilder sb = new StringBuilder();
                 sb.Append("c ");
+                sb.Append(curr_name + " ");
                 foreach (var item in chosenUsers)
                 {
                     sb.Append(item + " ");
                 }
                 sb.Append(txtName.Text);
                 sw.WriteLine(sb.ToString());
+                sw.Flush();
                 this.Close();
             }
         }

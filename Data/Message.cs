@@ -20,6 +20,7 @@ namespace Data
         public int ID_Chat { get; set; }
         [DataMember]
         public string[] Names { get; set; }
+        [DataMember]
         public string Sender { get; set; }
         public MessageGroup() { }
         public MessageGroup(int id, string body, string[] names, string Sender, DateTime date)

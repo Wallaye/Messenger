@@ -129,7 +129,7 @@ namespace Messenger.Server
                     else if (sb[0] == 'c')
                     {
                         var strs = sb.ToString().Split(" ");
-                        _chats.Add(new(_chats.Count, strs[1..^2], strs[^1]));
+                        _chats.Add(new(_chats.Count, strs[1..^1], strs[^1]));
                         Console.WriteLine(client.user.Name + " создал групповой чат ");
                         foreach (var el in _connectedUsers)
                         {
