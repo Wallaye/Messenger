@@ -8,7 +8,7 @@
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         WindowStyle="None"
-        Title="RegistrationWindow" Height="360" Width="500">
+        Title="RegistrationWindow" Height="360" Width="500" Icon="/login.ico">
     <Grid>
         <Grid.Background>
             <RadialGradientBrush>

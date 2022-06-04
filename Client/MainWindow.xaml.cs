@@ -160,7 +160,7 @@ namespace Client
                     MessageGroup msg = JsonSerializer.Deserialize(str[1..], typeof(MessageGroup)) as MessageGroup;
                     messages.Add(msg);
                     int selected = 0;
-                    Dispatcher.Invoke(() => selected = lstPrivateChats.SelectedIndex);
+                    Dispatcher.Invoke(() => selected = lstChats.SelectedIndex);
                     if (selected >= 0)
                     {
                         if (msg.ID_Chat == usersGrpChats[selected].ID_Chat)

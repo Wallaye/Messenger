@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         ResizeMode="CanMinimize"
         WindowStartupLocation="CenterScreen"
-        Title="CreateGroupChat" Height="468" Width="650">
+        Title="Выберите не меньше 2 участников" Height="468" Width="650" Icon="/create.ico">
     <Grid>
         <ListBox x:Name="lstUsers" HorizontalAlignment="Left" Height="280" Margin="33,57,0,0" VerticalAlignment="Top" Width="226" FontSize="18"/>
         <ListBox x:Name="lstChosen" HorizontalAlignment="Left" Height="280" Margin="391,57,0,0" VerticalAlignment="Top" Width="235" FontSize="18"/>

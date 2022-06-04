@@ -60,7 +60,7 @@ namespace Client
 
         private void btnCreate_Click(object sender, RoutedEventArgs e)
         {
-            if (chosenUsers.Count < 3)
+            if (chosenUsers.Count < 2)
             {
                 MessageBox.Show("Невозможно создать чат меньше чем из 3 пользователей");
             }
