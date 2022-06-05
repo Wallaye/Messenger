@@ -28,5 +28,6 @@
         <ListBox x:Name="lstChats" HorizontalAlignment="Left" Height="252" Margin="44,468,0,0" VerticalAlignment="Top" Width="324" FontSize="18" SelectionChanged="lstChats_SelectionChanged"/>
         <Label Content="Групповые чаты" HorizontalAlignment="Left" Height="41" Margin="44,0,0,0" VerticalAlignment="Center" Width="324" HorizontalContentAlignment="Center" FontSize="18"/>
         <Button x:Name="btnInfo" Content="Информация" HorizontalAlignment="Left" Height="42" Margin="996,62,0,0" VerticalAlignment="Top" Width="166" FontSize="18" Click="btnInfo_Click" Visibility="Collapsed"/>
+        <Label x:Name="lblUserName" Content="" HorizontalAlignment="Left" Height="48" Margin="44,18,0,0" VerticalAlignment="Top" Width="324" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="18"/>
     </Grid>
 </Window>

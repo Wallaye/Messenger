@@ -46,6 +46,7 @@ namespace Client
         {
             InitializeComponent();
             this.curr_name = curr_name;
+            lblUserName.Content = curr_name;
             tcpClient = tcp;
             lstPrivateChats.ItemsSource = userNames;
             lstChats.ItemsSource = chatNames;
@@ -100,7 +101,7 @@ namespace Client
                 }
                 catch (SocketException ex)
                 {
-                    MessageBox.Show("Разрыв соединения с сервером");
+                    //MessageBox.Show("Разрыв соединения с сервером");
                     UIContext?.Send(x =>
                     {
                         btnCreateGroup.IsEnabled = false;
@@ -110,6 +111,7 @@ namespace Client
                 }
                 catch (Exception ex)
                 {
+                    MessageBox.Show(ex.Message);
                     UIContext?.Send(x =>
                     {
                         btnCreateGroup.IsEnabled = false;
