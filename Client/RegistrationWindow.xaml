@@ -25,7 +25,7 @@
         <Label Content="Пароль:" HorizontalAlignment="Left" Height="34" Margin="53,136,0,0" VerticalAlignment="Top" Width="84" HorizontalContentAlignment="Right" VerticalContentAlignment="Bottom" FontSize="18"/>
         <Label Content="Повторите пароль:" HorizontalAlignment="Left" Height="34" Margin="-5,195,0,0" VerticalAlignment="Top" Width="142" HorizontalContentAlignment="Right" FontSize="14"/>
         <TextBox x:Name="txtLogin" HorizontalAlignment="Center" Height="34" Margin="0,80,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="206" FontSize="18" TextAlignment="Left" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" PreviewTextInput="txtLogin_PreviewTextInput"/>
-        <PasswordBox x:Name="pswPass1" HorizontalAlignment="Center" Height="34" Margin="0,136,0,0" VerticalAlignment="Top" Width="206" PreviewTextInput="pswPass1_PreviewTextInput"/>
-        <PasswordBox x:Name="pswPass2" HorizontalAlignment="Center" Height="34" Margin="0,195,0,0" VerticalAlignment="Top" Width="206" PreviewTextInput="pswPass2_PreviewTextInput"/>
+        <PasswordBox x:Name="pswPass1" HorizontalAlignment="Center" Height="34" Margin="0,136,0,0" VerticalAlignment="Top" Width="206" PreviewTextInput="pswPass1_PreviewTextInput" FontSize="18"/>
+        <PasswordBox x:Name="pswPass2" HorizontalAlignment="Center" Height="34" Margin="0,195,0,0" VerticalAlignment="Top" Width="206" PreviewTextInput="pswPass2_PreviewTextInput" FontSize="18"/>
     </Grid>
 </Window>
