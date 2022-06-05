@@ -37,6 +37,11 @@ namespace Messenger.Server
         /// </summary>
         public static void stop()
         {
+            foreach (var user in _connectedUsers)
+            {
+                user.sw.WriteLine();
+                user.tcpClient.Close();
+            }
             SerializeUsers();
             SerializeMessages();
             SerializeGroups();

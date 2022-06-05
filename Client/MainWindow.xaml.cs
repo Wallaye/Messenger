@@ -91,17 +91,30 @@ namespace Client
                         ReadMessage();
                         Task.Delay(20).Wait();
                     }
-                    //MessageBox.Show("Разрыв соединения с сервером");
-                    btnCreateGroup.IsEnabled = false;
-                    btnSend.IsEnabled = false;
+                    MessageBox.Show("Разрыв соединения с сервером");
+                    UIContext?.Send(x =>
+                    {
+                        btnCreateGroup.IsEnabled = false;
+                        btnSend.IsEnabled = false;
+                    }, null);
                 }
                 catch (SocketException ex)
                 {
                     MessageBox.Show("Разрыв соединения с сервером");
+                    UIContext?.Send(x =>
+                    {
+                        btnCreateGroup.IsEnabled = false;
+                        btnSend.IsEnabled = false;
+                    }, null);
+                    
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message);
+                    UIContext?.Send(x =>
+                    {
+                        btnCreateGroup.IsEnabled = false;
+                        btnSend.IsEnabled = false;
+                    }, null);
                 }
             });
         }
@@ -198,6 +211,7 @@ namespace Client
                     UIContext.Send(x => userNames.Add(str[2..]), null);
                 }
             }
+            else tcpClient.Close();
         }
 
         private void btnCreateGroup_Click(object sender, RoutedEventArgs e)

@@ -71,7 +71,7 @@ namespace Client
             TcpClient tcp = new();
             try
             {
-                tcp.Connect("192.168.0.115", 5500);
+                tcp.Connect("192.168.0.104", 5500);
                 if (tcp.Connected)
                 {
                     var sw = new StreamWriter(tcp.GetStream());
